@@ -19,36 +19,54 @@ while (lines[ff]!="")
     ff++;
 }
 
-
-
-foreach (string line in lines.Skip(ff + 1))
+void part1()
 {
 
-    var ls = line[1..(line.Count() -1)].Split(',');
-
-    Dictionary<char, int> values = new();
-    foreach (var val in ls)
+    foreach (string line in lines.Skip(ff + 1))
     {
-        var kvp = val.Split('=');
-        values.Add(kvp[0][0], int.Parse(kvp[1]));
+
+        var ls = line[1..(line.Count() - 1)].Split(',');
+
+        Dictionary<char, int> values = new();
+        foreach (var val in ls)
+        {
+            var kvp = val.Split('=');
+            values.Add(kvp[0][0], int.Parse(kvp[1]));
+        }
+
+        parts.Add((values, "in"));
     }
 
-    parts.Add((values,"in"));
-}
-
-for(int i=0; i<parts.Count; i++)
-{
-
-    while (parts[i].nextFonk != "R"&& parts[i].nextFonk!="A")
+    for (int i = 0; i < parts.Count; i++)
     {
-        parts[i] = evaluate(parts[i]);
+
+        while (parts[i].nextFonk != "R" && parts[i].nextFonk != "A")
+        {
+            parts[i] = evaluate(parts[i]);
+        }
     }
+
+    
+    long total = 0;
+    foreach (var part in parts)
+    {
+        if (part.nextFonk == "A")
+            foreach (var val in part.vals)
+            {
+                //Console.WriteLine(val.Value);
+                total += val.Value;
+            }
+        //Console.WriteLine(part);
+    }
+    Console.WriteLine(total);
+
+
 }
 
 (Dictionary<char, int> vals, string nextFonk)
-evaluate((Dictionary<char, int> vals,string nextFonk) part)
+    evaluate((Dictionary<char, int> vals, string nextFonk) part)
 {
-    (Dictionary<char, int> vals, string nextFonk) ret = (part.vals,"");
+    (Dictionary<char, int> vals, string nextFonk) ret = (part.vals, "");
     var fonk = fonks[part.nextFonk];
 
     foreach (var eval in fonk)
@@ -84,25 +102,13 @@ evaluate((Dictionary<char, int> vals,string nextFonk) part)
 
     return ret;
 }
-long total = 0;
-foreach (var part in parts)
-{
-    if (part.nextFonk == "A")
-        foreach (var val in part.vals)
-        {
-            //Console.WriteLine(val.Value);
-            total += val.Value;
-        }
-    //Console.WriteLine(part);
-}
-Console.WriteLine(total);
 
 //px{a<2006:qkq,m>2090:A,rfg}
 List<(char c, char cond, int cmp, string next)> parseFonks(string line)
 {
     List<(char c, char cond, int cmp, string next)> ret = new();
 
-    line = line[0..(line.Length-1)];
+    line = line[0..(line.Length - 1)];
     var ls = line.Split(",");
     foreach (var condo in ls)
     {
@@ -137,23 +143,3 @@ List<(char c, char cond, int cmp, string next)> parseFonks(string line)
     return ret;
 }
 
-
-
-
-
-/*
- * If a part is sent to another workflow, 
- * it immediately switches to the start of that workflow instead and never returns. 
- * If a part is accepted (sent to A) or rejected (sent to R), the part immediately stops any further
- * 
- * 
- * 
- */
-
-/*
-     *  x: Extremely cool looking
-        m: Musical (it makes a noise when you hit it)
-        a: Aerodynamic
-        s: Shiny
- * 
- * */
