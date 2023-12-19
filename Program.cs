@@ -84,122 +84,6 @@ void part2()
     }
     Console.WriteLine($"part2:\t{ans}");
 }
-
-/*
-int findLastS(int low, int high, int x, int m, int a, string target)
-{
-    int result = -1;
-    while (low <= high)
-    {
-        int mid = (low + high) / 2;
-
-        Dictionary<char, int> midTry = new() { { 'x', x }, { 'm', m }, { 'a', a }, { 's', mid } };
-        if (target == bruteForce(midTry, "in"))
-        {
-            result = mid;
-            low = mid + 1;
-        }
-        else
-        {
-            high = mid - 1;
-        }
-    }
-    return result;
-}
-
-int findLastA(int low, int high, int x, int m, int s, string target)
-{
-    int result = -1;
-    while (low <= high)
-    {
-        int mid = (low + high) / 2;
-
-        Dictionary<char, int> midTry = new() { { 'x', x }, { 'm', m }, { 'a', mid }, { 's', s } };
-        if (target == bruteForce(midTry, "in"))
-        {
-            result = mid;
-            low = mid + 1;
-        }
-        else
-        {
-            high = mid - 1;
-        }
-    }
-    return result;
-}
-
-int findLastM(int low, int high, int x, int a, int s, string target)
-{
-    int result = -1;
-    while (low <= high)
-    {
-        int mid = (low + high) / 2;
-
-        Dictionary<char, int> midTry = new() { { 'x', x }, { 'm', mid }, { 'a', a }, { 's', s } };
-        if (target == bruteForce(midTry, "in"))
-        {
-            result = mid;
-            low = mid + 1;
-        }
-        else
-        {
-            high = mid - 1;
-        }
-    }
-    return result;
-}
-
-int findLastX(int low, int high, int m, int s, int a, string target)
-{
-    int result = -1;
-    while (low <= high)
-    {
-        int mid = (low + high) / 2;
-
-        Dictionary<char, int> midTry = new() { { 'x', mid }, { 'm', m }, { 'a', a }, { 's', s } };
-        if (target == bruteForce(midTry, "in"))
-        {
-            result = mid;
-            low = mid + 1;
-        }
-        else
-        {
-            high = mid - 1;
-        }
-    }
-    return result;
-}*/
-string bruteForce(Dictionary<char, int> vals, string nextFonk)
-{
-    while (nextFonk.Last()!='R' && nextFonk.Last() != 'A')
-    {
-        nextFonk = evaluateChain(vals, nextFonk);
-    }
-    return nextFonk;
-}
-
-string evaluateChain(Dictionary<char, int> vals, string nextFonk)
-{
-    var fonk = fonks[nextFonk.Split(',').Last()];
-    foreach (var eval in fonk)
-    {
-        switch (eval.cond)
-        {
-            case '_':
-                return nextFonk+","+eval.next;
-            case '<':
-                if (vals[eval.c] < eval.cmp)
-                    return nextFonk + "," + eval.next;
-                continue;
-            case '>':
-                if (vals[eval.c] > eval.cmp)
-                    return nextFonk + "," + eval.next;
-                continue;
-        }
-    }
-    Debug.Assert(false);
-    return "";
-}
 void part1(int skipahead)
 {
 
@@ -280,8 +164,6 @@ void part1(int skipahead)
 
     return ret;
 }
-
-//px{a<2006:qkq,m>2090:A,rfg}
 List<(char c, char cond, int cmp, string next)> parseFonks(string line)
 {
     List<(char c, char cond, int cmp, string next)> ret = new();
