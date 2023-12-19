@@ -19,10 +19,191 @@ while (lines[ff]!="")
     ff++;
 }
 
-void part1()
+part1(ff+1);
+part2();
+
+
+void part2()
+{
+    ulong ans = 0;
+
+    PriorityQueue<chonk,string> chonks = new();
+
+    chonks.Enqueue(new(new() {
+        { 'x',(1,4000)},
+        { 'm',(1,4000)},
+        { 'a',(1,4000)},
+        { 's',(1,4000)},
+    })
+        ,"in");
+
+    while (chonks.TryDequeue(out chonk restOfIt, out string instruction))
+    {
+        if (instruction == "A")
+        {
+            ulong a = 1;
+            foreach (var range in restOfIt.v.Values)
+            {
+                a *= Convert.ToUInt64(range.max - range.min) + 1;
+            }
+            ans += a;
+            continue;
+        }
+        if (instruction == "R")
+            continue;
+        foreach (var fonk in fonks[instruction])
+        {
+            switch (fonk.cond)
+            {
+                case '_':
+                    chonks.Enqueue(restOfIt, fonk.next);
+                    break;
+                case '<':
+                    if (restOfIt.v[fonk.c].min < fonk.cmp)
+                    {
+                        chonk newChonk = restOfIt.deepCopy();
+                        newChonk.setMaxIfLower(fonk.c, fonk.cmp - 1);
+                        chonks.Enqueue(newChonk, fonk.next);
+                        restOfIt.setMinIfHigher(fonk.c, fonk.cmp);
+                        break;
+                    }
+                    break;
+                case '>':
+                    if (restOfIt.v[fonk.c].max > fonk.cmp)
+                    {
+                        chonk newChonk = restOfIt.deepCopy();
+                        newChonk.setMinIfHigher(fonk.c, fonk.cmp + 1);
+                        chonks.Enqueue(newChonk, fonk.next);
+                        restOfIt.setMaxIfLower(fonk.c, fonk.cmp);
+                    }
+                    break;
+            }
+            if (fonk.c != '_' && restOfIt.v[fonk.c].min > restOfIt.v[fonk.c].max)
+                break;//theres nothing left
+        }
+    }
+    Console.WriteLine($"part2:\t{ans}");
+}
+
+/*
+int findLastS(int low, int high, int x, int m, int a, string target)
+{
+    int result = -1;
+    while (low <= high)
+    {
+        int mid = (low + high) / 2;
+
+        Dictionary<char, int> midTry = new() { { 'x', x }, { 'm', m }, { 'a', a }, { 's', mid } };
+        if (target == bruteForce(midTry, "in"))
+        {
+            result = mid;
+            low = mid + 1;
+        }
+        else
+        {
+            high = mid - 1;
+        }
+    }
+    return result;
+}
+
+int findLastA(int low, int high, int x, int m, int s, string target)
+{
+    int result = -1;
+    while (low <= high)
+    {
+        int mid = (low + high) / 2;
+
+        Dictionary<char, int> midTry = new() { { 'x', x }, { 'm', m }, { 'a', mid }, { 's', s } };
+        if (target == bruteForce(midTry, "in"))
+        {
+            result = mid;
+            low = mid + 1;
+        }
+        else
+        {
+            high = mid - 1;
+        }
+    }
+    return result;
+}
+
+int findLastM(int low, int high, int x, int a, int s, string target)
+{
+    int result = -1;
+    while (low <= high)
+    {
+        int mid = (low + high) / 2;
+
+        Dictionary<char, int> midTry = new() { { 'x', x }, { 'm', mid }, { 'a', a }, { 's', s } };
+        if (target == bruteForce(midTry, "in"))
+        {
+            result = mid;
+            low = mid + 1;
+        }
+        else
+        {
+            high = mid - 1;
+        }
+    }
+    return result;
+}
+
+int findLastX(int low, int high, int m, int s, int a, string target)
+{
+    int result = -1;
+    while (low <= high)
+    {
+        int mid = (low + high) / 2;
+
+        Dictionary<char, int> midTry = new() { { 'x', mid }, { 'm', m }, { 'a', a }, { 's', s } };
+        if (target == bruteForce(midTry, "in"))
+        {
+            result = mid;
+            low = mid + 1;
+        }
+        else
+        {
+            high = mid - 1;
+        }
+    }
+    return result;
+}*/
+string bruteForce(Dictionary<char, int> vals, string nextFonk)
+{
+    while (nextFonk.Last()!='R' && nextFonk.Last() != 'A')
+    {
+        nextFonk = evaluateChain(vals, nextFonk);
+    }
+    return nextFonk;
+}
+
+string evaluateChain(Dictionary<char, int> vals, string nextFonk)
+{
+    var fonk = fonks[nextFonk.Split(',').Last()];
+    foreach (var eval in fonk)
+    {
+        switch (eval.cond)
+        {
+            case '_':
+                return nextFonk+","+eval.next;
+            case '<':
+                if (vals[eval.c] < eval.cmp)
+                    return nextFonk + "," + eval.next;
+                continue;
+            case '>':
+                if (vals[eval.c] > eval.cmp)
+                    return nextFonk + "," + eval.next;
+                continue;
+        }
+    }
+    Debug.Assert(false);
+    return "";
+}
+void part1(int skipahead)
 {
 
-    foreach (string line in lines.Skip(ff + 1))
+    foreach (string line in lines.Skip(skipahead))
     {
 
         var ls = line[1..(line.Count() - 1)].Split(',');
@@ -39,7 +220,6 @@ void part1()
 
     for (int i = 0; i < parts.Count; i++)
     {
-
         while (parts[i].nextFonk != "R" && parts[i].nextFonk != "A")
         {
             parts[i] = evaluate(parts[i]);
@@ -58,9 +238,7 @@ void part1()
             }
         //Console.WriteLine(part);
     }
-    Console.WriteLine(total);
-
-
+    Console.WriteLine($"part1:\t{total}");
 }
 
 (Dictionary<char, int> vals, string nextFonk)
@@ -143,3 +321,23 @@ List<(char c, char cond, int cmp, string next)> parseFonks(string line)
     return ret;
 }
 
+record struct chonk
+{
+    public chonk(Dictionary<char, (int min, int max)> v)
+    { this.v = v; }
+    public Dictionary<char, (int min, int max)> v;
+    public chonk deepCopy()
+    {
+        return new chonk(v.ToDictionary(x=>x.Key,x=>x.Value));
+    }
+    public void setMinIfHigher(char c, int min)
+    {
+        if(min > v[c].min)
+            v[c] = (min,v[c].max);
+    }
+    public void setMaxIfLower(char c, int max)
+    {
+        if (max < v[c].max)
+            v[c] = (v[c].min,max);
+    }
+}
